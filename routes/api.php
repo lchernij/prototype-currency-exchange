@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\User\Currency\CurrencyController as UserCurrencyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,5 +20,9 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('currencies', CurrencyController::class, ['only' => ["index","show"]]);
+    Route::apiResource('currencies', CurrencyController::class, ['only' => ["index", "show"]]);
+
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::apiResource('currencies', UserCurrencyController::class);
+    });
 });

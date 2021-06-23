@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Feature\Currencies;
+namespace Tests\Feature\User\Currencies;
 
-use App\Models\Currency;
 use App\Models\User;
+use App\Models\UserCurrency;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,7 +13,7 @@ class ShowTest extends TestCase
 
     public function testIsProtectedRoute(): void
     {
-        $this->getJson('api/currencies/123')
+        $this->getJson('api/user/currencies/123')
             ->assertStatus(401)
             ->assertExactJson(
                 [
@@ -26,11 +26,11 @@ class ShowTest extends TestCase
     {
         $this->mockUserAuth();
 
-        $this->getJson('api/currencies/123')
+        $this->getJson('api/user/currencies/123')
             ->assertStatus(404)
             ->assertJsonFragment(
                 [
-                    'message' => 'No query results for model [App\\Models\\Currency].',
+                    'message' => 'No query results for model [App\\Models\\UserCurrency].',
                 ]
             );
     }
@@ -38,19 +38,23 @@ class ShowTest extends TestCase
     public function testShow(): void
     {
         $this->mockUserAuth();
-        $currency = Currency::factory()->create();
+        $currency = UserCurrency::factory()->create([
+            'user_id' => $this->user->id
+        ]);
 
-        $this->getJson('api/currencies/' . $currency->uuid)
+        $this->getJson('api/user/currencies/' . $currency->uuid)
             ->assertStatus(200)
             ->assertExactJson(
                 [
                     'data' => [
-                        'created_at' => $currency->created_at,
-                        'deleted_at' => NULL,
-                        'description' => $currency->description,
-                        'symbol' => $currency->symbol,
-                        'updated_at' => $currency->updated_at,
                         'uuid' => $currency->uuid,
+                        'value_trigger' => $currency->value_trigger,
+                        'value_action' => $currency->value_action,
+                        'currency' => [
+                            'uuid' => $currency->currency->uuid,
+                            'symbol' => $currency->currency->symbol,
+                            'description' => $currency->currency->description,
+                        ]
                     ]
                 ]
             );
@@ -58,8 +62,8 @@ class ShowTest extends TestCase
 
     private function mockUserAuth(): void
     {
-        $user = User::factory()->create();
+        $this->user = User::factory()->create();
 
-        $this->be($user);
+        $this->be($this->user);
     }
 }

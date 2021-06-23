@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Feature\Currencies;
+namespace Tests\Feature\Users\Currencies;
 
-use App\Models\Currency;
 use App\Models\User;
+use App\Models\UserCurrency;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -13,7 +13,7 @@ class IndexTest extends TestCase
 
     public function testIsProtectedRoute(): void
     {
-        $this->getJson('api/currencies')
+        $this->getJson('api/user/currencies')
             ->assertStatus(401)
             ->assertExactJson(
                 [
@@ -26,7 +26,7 @@ class IndexTest extends TestCase
     {
         $this->mockUserAuth();
 
-        $this->getJson('api/currencies')
+        $this->getJson('api/user/currencies')
             ->assertStatus(200)
             ->assertExactJson(
                 [
@@ -43,21 +43,23 @@ class IndexTest extends TestCase
     {
         $this->mockUserAuth();
         $this->mockCurrencies();
-        $currency = Currency::first();
+        $currency = UserCurrency::first();
 
-        $this->getJson('api/currencies')
+        $this->getJson('api/user/currencies')
             ->assertStatus(200)
             ->assertExactJson(
                 [
                     'count' => 1,
                     'data' => [
                         [
-                            'created_at' => $currency->created_at,
-                            'deleted_at' => NULL,
-                            'description' => $currency->description,
-                            'symbol' => $currency->symbol,
-                            'updated_at' => $currency->updated_at,
                             'uuid' => $currency->uuid,
+                            'value_trigger' => $currency->value_trigger,
+                            'value_action' => $currency->value_action,
+                            'currency' => [
+                                'uuid' => $currency->currency->uuid,
+                                'symbol' => $currency->currency->symbol,
+                                'description' => $currency->currency->description,
+                            ]
                         ]
                     ],
                     'next' => null,
@@ -72,13 +74,13 @@ class IndexTest extends TestCase
         $this->mockUserAuth();
         $this->mockCurrencies(11);
 
-        $this->getJson('api/currencies?page=2')
+        $this->getJson('api/user/currencies?page=2')
             ->assertStatus(200)
             ->assertJsonFragment(
                 [
                     'count' => 5,
-                    'next' => 'http://localhost/api/currencies?page=3',
-                    'prev' => 'http://localhost/api/currencies?page=1',
+                    'next' => 'http://localhost/api/user/currencies?page=3',
+                    'prev' => 'http://localhost/api/user/currencies?page=1',
                     'total' => 11,
                 ]
             );
@@ -86,13 +88,15 @@ class IndexTest extends TestCase
 
     private function mockUserAuth(): void
     {
-        $user = User::factory()->create();
+        $this->user = User::factory()->create();
 
-        $this->be($user);
+        $this->be($this->user);
     }
 
     private function mockCurrencies(int $count = 1): void
     {
-        Currency::factory()->count($count)->create();
+        UserCurrency::factory()->count($count)->create([
+            'user_id' => $this->user->id
+        ]);
     }
 }
