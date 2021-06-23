@@ -4,22 +4,12 @@ namespace Tests\Feature\Users;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
 {
     use RefreshDatabase;
-    
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->headers = [
-            "Accept" => "application/json"
-        ];
-    }
 
     /**
      * @dataProvider provideInvalidInputs
