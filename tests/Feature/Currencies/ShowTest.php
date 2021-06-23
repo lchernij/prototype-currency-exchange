@@ -13,7 +13,7 @@ class ShowTest extends TestCase
 
     public function testIsProtectedRoute(): void
     {
-        $this->getJson('api/currencies/123')
+        $this->getJson('api/currencies/6cc43b06-2eef-48c5-9a0e-0124a269406f')
             ->assertStatus(401)
             ->assertExactJson(
                 [
@@ -26,7 +26,7 @@ class ShowTest extends TestCase
     {
         $this->mockUserAuth();
 
-        $this->getJson('api/currencies/123')
+        $this->getJson('api/currencies/6cc43b06-2eef-48c5-9a0e-0124a269406f')
             ->assertStatus(404)
             ->assertJsonFragment(
                 [
