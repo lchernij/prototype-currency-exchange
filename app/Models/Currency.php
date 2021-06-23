@@ -19,4 +19,8 @@ class Currency extends Model
         'symbol',
         'description'
     ];
+
+    protected $hidden = [
+        'id'
+    ];
 }

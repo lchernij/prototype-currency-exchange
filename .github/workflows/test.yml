@@ -37,7 +37,7 @@ jobs:
       run: chmod -R 777 storage bootstrap/cache
     
     - name: Execute tests (Unit and Feature tests) via PHPUnit With code coverage
-      run: vendor/bin/phpunit --coverage-html .github/workflows/reports/ --stop-on-fail --coverage-text=.github/workflows/coverage; sed -n 6,9p -- .github/workflows/coverage > .github/workflows/coverage-summary
+      run: vendor/bin/phpunit --coverage-html .github/workflows/reports/ --coverage-text=.github/workflows/coverage; sed -n 6,9p -- .github/workflows/coverage > .github/workflows/coverage-summary
       env:
         DB_CONNECTION: pgsql
         DB_HOST: localhost
